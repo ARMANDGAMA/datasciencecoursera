@@ -1,0 +1,336 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+myfunction <- function() {
+  x <- rnorm(100)
+  mean(x)
+}
+ myfunction()
+```
+
+
+```{r}
+getwd()
+```
+```{r}
+#Base Plot
+library(datasets)
+data(cars)
+with(cars, plot(speed, dist))
+```
+```{r}
+#Lattice Plot
+library(lattice)
+state <- data.frame(state.x77, region = state.region)
+xyplot(Life.Exp ~ Income | region, data = state, layout = c(4,1))
+```
+```{r}
+#ggplot
+library(ggplot2)
+data(mpg)
+qplot(displ, hwy, data = mpg)
+```
+```{r}
+#Simple Base Graphics: Histogram
+library(datasets)
+
+#Crear color
+t_col <- function(color, percent = 50, name = NULL) {
+  rgb.val <- col2rgb(color)
+  t.col <- rgb(rgb.val[1], rgb.val[2], rgb.val[3],
+             max = 255,
+             alpha = (100 - percent) * 255 / 100,
+             names = name)
+  invisible(t.col)
+}
+
+micolor <- t_col("blue", perc = 60, name = "lr.blue")
+#par(bg = "blue")
+hist(airquality$Ozone, col = micolor) #Draw a new plot
+```
+```{r}
+#Simple Base Graphics: Boxplot
+
+
+
+library(datasets)
+airquality <- transform(airquality, Month = factor(Month))
+boxplot(Ozone ~ Month, airquality, xlab = "Month", ylab = "Ozone (ppb)")
+```
+```{r}
+library(ggplot2)
+with(airquality, plot(Wind, Ozone, main = "Ozone and Wind in New York City"))
+with( subset( airquality, Month == 5), points(Wind, Ozone, col = "blue"))
+```
+```{r}
+with(airquality, plot( Wind, Ozone, main = "Ozone and Wind in New York City", type = "n"))
+with( subset( airquality, Month == 5), points( Wind, Ozone, col = "blue"))
+with( subset( airquality, Month != 5), points( Wind, Ozone, col = "red"))
+legend("topright", pch = 1, col = 1, col = c("blue", "red"), legend = c( "May", "Other Months"))
+```
+```{r}
+with( airquality, plot( Wind, Ozone, main = "Ozone and Wind in New York City", pch = 20))
+model <- lm( Ozone ~ Wind, airquality)
+abline( model, lwd = 2, col = "blue")
+summary(model)
+```
+```{r}
+par( mfrow = c(1,2))
+with( airquality, {
+  plot( Wind, Ozone, main = "Ozone and Wind", pch = 7)
+  plot( Solar.R, Ozone, main = "Ozone and Solar Radiation")
+})
+```
+```{r}
+par( mfrow = c(1,3), mar = c( 4, 4, 2, 1), oma = c( 0, 0, 2, 0))
+with( airquality, {
+  plot(Wind, Ozone, main = "Ozone and Wind")
+  plot( Solar.R, Ozone, main = "Ozone and Solar Radiation")
+  plot(Temp, Ozone, main = "Ozone and Temperature")
+  mtext("Ozone and Weather in New York City", outer = TRUE)
+})
+```
+```{r}
+x <- rnorm(100)
+hist(x)
+y <- rnorm(100)
+plot(x, y)
+par(mar = c(3 ,3 ,3 ,3 ))
+plot(x, y)
+```
+```{r}
+Y <- rnorm(100)
+plot(x, y, pch = 20)
+title("Scatterplot")
+text(-2, -2, "Label")
+legend("topleft", legend = "Data", pch = 20)
+fit <- lm(y ~ x)
+abline(fit, lwd = 3, col = "blue")
+```
+
+
+```{r}
+z <- rpois(100, 2)
+par(mfrow = c(2, 1))
+plot(x, y, pch = 20, ylab = "Eje Y")
+plot(x, z, pch = 18)
+```
+```{r}
+library(lattice)
+library(datasets)
+
+##Simple scatterplot
+xyplot(Ozone ~ Wind, data = airquality)
+```
+```{r}
+airquality <- transform(airquality, Month = factor(Month))
+xyplot(Ozone ~ Wind | Month, data = airquality, layout = c(5,1))
+```
+```{r}
+set.seed(10)
+x <- rnorm(100)
+f <- rep(0:1, each = 50)
+y <- x + f -f * x + rnorm(100, sd = 0.5)
+f <- factor(f, labels = c("Group 1", "Group 2"))
+xyplot(y ~ x | f, layout = c(2,1)) #Plot con dos paneles
+```
+```{r}
+## Custom panel function
+xyplot(y ~ x | f, panel = function(x, y, ...){
+  panel.xyplot(x, y, ...) ## Default panel function
+  panel.abline(h = median(y),lty = 2)
+})
+```
+```{r}
+## Custom panel function
+xyplot(y ~ x | f, panel = function(x, y, ...){
+  panel.xyplot(x, y, ...) ## Default panel function
+  panel.lmline(x, y, col = 2) ##linear regression
+})
+```
+```{r}
+library(ggplot2)
+str(mpg)
+```
+```{r}
+qplot(displ, hwy, data = mpg)
+```
+```{r}
+qplot(displ, hwy, data = mpg, color = drv)
+```
+```{r}
+qplot(displ, hwy, data = mpg, geom = c("point", "smooth"))
+```
+```{r}
+qplot(hwy, data = mpg, fill = drv)
+```
+```{r}
+qplot(displ,hwy, data = mpg, facets = .~drv)
+qplot(hwy, data = mpg, facets = drv~., binwidth = 2)
+```
+```{r}
+qplot(log(hwy), data = mpg)
+qplot(log(hwy), data = mpg, geom = "density")
+qplot(log(hwy), data = mpg, geom = "density", color = drv)
+```
+```{r}
+qplot(log(displ),log(hwy), data = mpg, color = drv)+geom_smooth(method = "lm")
+qplot(log(displ),log(hwy), data = mpg, facets =  .~drv)+geom_smooth(method = "lm")
+
+```
+```{r}
+library(ggplot2)
+g <- ggplot(mpg, aes(displ, hwy))
+summary(g)
+p <- g + geom_point() 
+print(p)
+```
+```{r}
+g <- ggplot(mpg, aes(displ, hwy))
+p <- g + geom_point(color = "steelblue", size =4, alpha = (1/2)) 
+print(p)
+p <- g + geom_point(aes(color = cty), size =4, alpha = (1/2)) 
+print(p)
+```
+```{r}
+testdat <- data.frame(x= 1:100, y = rnorm(100))
+g <- ggplot(testdat, aes( x= x, y = y))
+g+geom_line() + coord_cartesian(ylim = c(-3,3))
+
+```
+```{r}
+set.seed(1234)
+par(mar = c(0, 0, 0, 0))
+x <- rnorm(12, mean = rep(1:3, each = 4), sd =0.2)
+y <- rnorm(12, mean = rep(c(1,2,1),each = 4), sd =.2)
+plot(x, y, col = "blue", pch = 19, cex = 2)
+text(x + .05, y + .05, labels = as.character(1:12))
+
+```
+```{r}
+dataFrame <- data.frame(x = x, y = y)
+dist(dataFrame)
+```
+```{r}
+dataFrame <- data.frame(x=x, y=y)
+distxy <- dist(dataFrame)
+hClustering <- hclust(distxy)
+plot(hClustering)
+```
+```{r}
+myplclust <- function(hclust, lab = hclust$labels, lab.col = rep(1,length(hclust$labels)), hang = 0.1,...){
+  y < -rep(hclust$height,2)
+  x <- as.numeric(hclust$merge)
+  y <- y[which(x < 0)]
+  x <- x[which(x < 0)]
+  x <- abs(x)
+  y <- y[order(x)]
+  x <- x[order(x)]
+  plot(hclust, labels = FALSE, hang = hang, ...)
+  text(x = x, y = y[hclust$order] - (max(hclust$height) + hang), labels = lab[hclust$order], col = lab.col[hclust$order], srt = 90, adj = c(1,0.5), xpd = NA, ...)
+}
+```
+```{r}
+dataFrame <- data.frame(x = x, y = y)
+distxy <- dist(dataFrame)
+hClusterin <- hclust(distxy)
+myplclust(hClustering, lab = rep(1:3, each = 4), lab.col = rep(1:3, each = 4))
+```
+```{r}
+dataFrame <- data.frame(x = x, y = y)
+set.seed(143)
+dataMatrix <- as.matrix(dataFrame)[sample(1:12), ]
+heatmap(dataMatrix)
+```
+```{r}
+set.seed(1234)
+par(mar = c(0, 0, 0, 0))
+x <- rnorm(12, mean = rep(1:3, each = 4), sd =0.2)
+y <- rnorm(12, mean = rep(c(1,2,1),each = 4), sd =.2)
+plot(x, y, col = "blue", pch = 19, cex = 2)
+text(x + .05, y + .05, labels = as.character(1:12))
+```
+```{r}
+dataFrame <- data.frame(x, y)
+kmeansObj <- kmeans(dataFrame, centers = 3)
+names(kmeansObj)
+```
+```{r}
+kmeansObj$cluster
+```
+```{r}
+par(mar = rep(0.2, 4))
+plot(x, y, col = kmeansObj$cluster, pch = 19, cex = 2)
+points(kmeansObj$centers, col = 1:3, pch = 3, cex = 3, lwd = 3)
+```
+```{r}
+set.seed(1234)
+dataMatrix <- as.matrix(dataFrame)[sample(1:12), ]
+kmeansObj2 <- kmeans(dataMatrix, centers = 3)
+par(mfrow = c(1,2), mar = c(2, 4, .1, .1))
+image(t(dataMatrix)[, nrow(dataMatrix):1], yaxt = "n")
+image(t(dataMatrix)[, order(kmeansObj$cluster):1], yaxt = "n")
+```
+```{r}
+set.seed(12345)
+par(mar = rep(.2,4))
+dataMatrix <- matrix(rnorm(400), nrow = 40)
+image(1:10, 1:40, t(dataMatrix)[, nrow(dataMatrix):1])
+```
+```{r}
+set.seed(678910)
+for (i in 1:40) {
+  #flip a coin
+  coinFlip <- rbinom(1, size = 1, prob = .5)
+  #if coin is heads add a common pattern to that row
+  if (coinFlip) {
+    dataMatrix[i,] <- dataMatrix[i,] + rep(c(0,3), each = 5)
+  }
+}
+```
+```{r}
+par(mar = rep(.2,4))
+image(1:10, 1:40, t(dataMatrix) [, nrow(dataMatrix):1])
+```
+```{r}
+pal <- colorRampPalette(c("red", "yellow"))
+pal(2)
+pal(10)
+```
+```{r}
+install.packages("RColorBrewer")
+```
+```{r}
+library(RColorBrewer)
+cols <- brewer.pal(3, "BuGn")
+cols
+```
+```{r}
+pal <- colorRampPalette(cols)
+image(volcano, col = pal(20))
+```
+```{r}
+x <- rnorm(10000)
+y <- rnorm(10000)
+smoothScatter(x, y)
+```
+```{r}
+plot(x, y, pch = 19)
+```
+```{r}
+plot(x, y, col = rgb(.80, .74, .51, .1), pch = 19)
+```
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
