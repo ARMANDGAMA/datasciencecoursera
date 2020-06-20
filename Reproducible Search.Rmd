@@ -1,0 +1,97 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+install.packages("kernlab")
+```
+```{r}
+#Este es un data set de spam que ofrece UCI 
+#Mas información en http://search.r-project.org/library/kernlab/html/spam.html
+library(kernlab)
+data(spam)
+str(spam[, 1:5])
+```
+```{r}
+#Perform the subsampling
+set.seed(3435)
+trainIndicator = rbinom(4601, size = 1, prob = 0.5)
+table(trainIndicator)
+```
+```{r}
+#Set of training and test
+trainSpam = spam[trainIndicator == 1,]
+testSpam = spam[trainIndicator == 0, ]
+```
+```{r}
+names(trainSpam)
+```
+```{r}
+head(trainSpam)
+```
+```{r}
+table(trainSpam$type)
+```
+```{r}
+plot(trainSpam$capitalAve ~ trainSpam$type)
+```
+```{r}
+plot(log10(trainSpam$capitalAve +1) ~ trainSpam$type)
+```
+```{r}
+#Correlación entre las primeras cuatro variables
+plot(log10(trainSpam[, 1:4] + 1))
+```
+```{r}
+hcluster = hclust(dist(t(trainSpam[,1:57])))
+plot(hcluster)
+```
+```{r}
+hclusterUpdated = hclust(dist(t(log10(trainSpam[,1:55] + 1))))
+plot(hclusterUpdated)
+```
+```{r}
+trainSpam$numType = as.numeric(trainSpam$type) - 1
+costFunction = function(x, y) sum(x != (y > 0.5))
+cvError = rep(NA,55)
+library(boot)
+for (i in 1:55){
+  lmFormula = reformulate(names(trainSpam)[i], response = "numType")
+  glmFit = glm(lmFormula, family = "binomial", data = trainSpam)
+  cvError[i] = cv.glm(trainSpam, glmFit, costFunction, 2)$delta[2]
+}
+
+#Cuál predictor tiene el error minimo en validación cruzada
+names(trainSpam)[which.min(cvError)]
+```
+```{r}
+#Usar el mejor modelo para el grupo
+predictionModel = glm(numType ~ charDollar, family = "binomial", data = trainSpam)
+
+#Realizar predicciones para en el set de prueba
+predictionTest = predict(predictionModel, testSpam)
+predictedSpam = rep("nonspam", dim(testSpam)[1])
+
+#Clasifica como spam todos aquellos con una probabilidad mayor a .5
+predictedSpam[predictionModel$fitted > 0.5] = "spam"
+```
+```{r}
+#Tabla de clasificación
+table(predictedSpam, testSpam$type)
+
+```
+```{r}
+#Data analysis
+
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
